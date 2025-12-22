@@ -1,0 +1,8 @@
+
+{
+  "name": "FACINDEMAIS - Nexus OS SaaS",
+  "description": "Ecossistema de alta performance para gestão operacional e financeira com IA Gemini integrada.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
