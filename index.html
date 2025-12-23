@@ -1,97 +1,155 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- VIEWPORT CORRETO PARA MOBILE -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+
     <title>FACINDEMAIS - Nexus OS</title>
+
+    <!-- TAILWIND CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- TAILWIND CONFIG -->
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
               cyber: {
-                black: '#1a0b2e', // Roxo profundo para o fundo
-                dark: '#240e3f',
-                neon: '#00f3ff',
-                pink: '#ff00ff',
-                yellow: '#f3ff00',
-                purple: '#7000ff',
-                card: 'rgba(36, 14, 63, 0.95)'
-              }
+                black: "#1a0b2e",
+                dark: "#240e3f",
+                neon: "#00f3ff",
+                pink: "#ff00ff",
+                yellow: "#f3ff00",
+                purple: "#7000ff",
+                card: "rgba(36, 14, 63, 0.95)",
+              },
             },
             fontFamily: {
-              orbitron: ['Orbitron', 'sans-serif'],
-              inter: ['Inter', 'sans-serif'],
-              mono: ['JetBrains Mono', 'monospace'],
+              orbitron: ["Orbitron", "sans-serif"],
+              inter: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
             },
             boxShadow: {
-              'neon-cyan': '0 0 20px #00f3ff, 0 0 40px rgba(0, 243, 255, 0.3)',
-              'neon-pink': '0 0 20px #ff00ff, 0 0 40px rgba(255, 0, 255, 0.3)',
-            }
-          }
-        }
-      }
+              "neon-cyan":
+                "0 0 20px #00f3ff, 0 0 40px rgba(0, 243, 255, 0.3)",
+              "neon-pink":
+                "0 0 20px #ff00ff, 0 0 40px rgba(255, 0, 255, 0.3)",
+            },
+          },
+        },
+      };
     </script>
+
+    <!-- CSS GLOBAL (AJUSTADO PARA MOBILE) -->
     <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+
       body {
         background-color: #1a0b2e;
         color: #e2e2e2;
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
+
+        /* 🔑 CORREÇÃO DEFINITIVA DO MOBILE */
         overflow-x: hidden;
+        overflow-y: auto;
       }
+
       .glass {
         background: rgba(36, 14, 63, 0.85);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.05);
       }
+
       .text-glow-neon {
         color: #00f3ff;
         text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
       }
+
       .cyber-grid {
-        background-image: 
-          linear-gradient(rgba(112, 0, 255, 0.1) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(112, 0, 255, 0.1) 1px, transparent 1px);
+        background-image: linear-gradient(
+            rgba(112, 0, 255, 0.1) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            90deg,
+            rgba(112, 0, 255, 0.1) 1px,
+            transparent 1px
+          );
         background-size: 50px 50px;
       }
+
       .digital-font {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: "JetBrains Mono", monospace;
       }
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: #1a0b2e; }
-      ::-webkit-scrollbar-thumb { background: #7000ff; border-radius: 10px; }
-      ::-webkit-scrollbar-thumb:hover { background: #00f3ff; }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #1a0b2e;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #7000ff;
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #00f3ff;
+      }
+
       .card-neo {
         background: rgba(46, 17, 85, 0.6);
         border: 1px solid rgba(0, 243, 255, 0.1);
         transition: all 0.3s ease;
       }
+
       .card-neo:hover {
         border-color: rgba(0, 243, 255, 0.4);
         background: rgba(46, 17, 85, 0.8);
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "recharts": "https://esm.sh/recharts@^3.6.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
-  <body class="cyber-grid min-h-screen">
+
+    <!-- IMPORT MAP -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@^19.2.3",
+          "react/": "https://esm.sh/react@^19.2.3/",
+          "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+          "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+          "recharts": "https://esm.sh/recharts@^3.6.0",
+          "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="/index.css" />
+  </head>
+
+  <!-- 🔑 BODY CORRIGIDO -->
+  <body class="cyber-grid min-h-screen overflow-y-auto">
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>
