@@ -205,7 +205,7 @@ const App: React.FC = () => {
       </aside>
 
       <main className="flex-1 md:ml-72 p-6 md:p-14 relative overflow-x-hidden overflow-y-auto">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto min-h-screen overflow-y-auto">
           {view === 'dashboard' && <Dashboard user={user} sales={filteredSales} expenses={filteredExpenses} />}
           {view === 'pos' && <POS products={filteredProducts} onSale={handleSaleCompletion} currentUser={user} />}
           {view === 'inventory' && <Inventory products={filteredProducts} setProducts={setProducts} currentUser={user} />}
