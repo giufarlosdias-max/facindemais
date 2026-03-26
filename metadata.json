@@ -1,0 +1,7 @@
+{
+  "name": "Remix: Nexus",
+  "description": "Gestão ágil de vendas, orçamentos, estoque e serviços. Repositório: https://github.com/giufarlosdias-max/nexus",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel=" icon\ href=\/icon.png\ />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus | Gestão Profissional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                blue: '#002147',
+                green: '#228B22',
+                orange: '#FFA500',
+                cyan: '#00BFFF',
+              }
+            },
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-blue: #002147;
+            --brand-green: #228B22;
+            --brand-orange: #FFA500;
+            --brand-cyan: #00BFFF;
+            --accent: var(--brand-blue);
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #1e293b;
+            margin: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            touch-action: manipulation;
+        }
+
+        .nexus-card {
+            background: var(--card-bg);
+            border-radius: 1.25rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        }
+
+        .nexus-card:hover {
+            border-color: var(--brand-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 191, 255, 0.1);
+        }
+
+        .btn-primary, .btn-orange, .btn-radiant {
+            background: var(--brand-blue);
+            color: #ffffff;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.2s ease;
+            border-radius: 0.75rem;
+        }
+
+        .btn-primary:hover, .btn-orange:hover, .btn-radiant:hover {
+            background: var(--brand-green);
+            box-shadow: 0 10px 15px -3px rgba(34, 139, 34, 0.2);
+        }
+
+        .btn-primary:active, .btn-orange:active, .btn-radiant:active { transform: scale(0.98); }
+
+        .text-glow-brand-blue { text-shadow: 0 0 10px rgba(0, 33, 71, 0.5); }
+        .text-glow-brand-green { text-shadow: 0 0 10px rgba(34, 139, 34, 0.5); }
+        .text-glow-brand-orange { text-shadow: 0 0 10px rgba(255, 165, 0, 0.5); }
+        .text-glow-brand-cyan { text-shadow: 0 0 10px rgba(0, 191, 255, 0.5); }
+        .box-glow-brand-cyan { box-shadow: 0 0 20px rgba(0, 191, 255, 0.2); }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        @keyframes simple-fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-fade { animation: simple-fade 0.3s ease-out forwards; }
+
+        .circle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 1rem;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #475569;
+        }
+
+        .circle-btn:hover {
+            background: #fff7ed;
+            color: var(--accent);
+            border-color: #fdba74;
+        }
+
+        .nav-btn {
+            border-radius: 0.75rem;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn.active { color: var(--accent); background: #fff7ed; }
+
+        @media (max-width: 1024px) {
+            .nexus-card { border-radius: 0.75rem; }
+            .circle-btn { width: 55px; height: 55px; }
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.39.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "firebase/": "https://esm.sh/firebase@^12.8.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

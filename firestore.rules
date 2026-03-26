@@ -1,0 +1,269 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (UID from Auth)
+    // Fields:
+    //   - uid: string (required) - User's unique ID
+    //   - email: string (required) - User's email
+    //   - officeName: string (required) - Name of the office
+    //   - role: string (required) - 'super-admin', 'admin', 'editor', 'viewer'
+    //   - status: string (required) - 'active', 'blocked'
+    //   - subscriptionStatus: string (required) - 'PAID', 'EXPIRED', 'TRIAL'
+    //   - phone: string (optional)
+    //   - createdAt: timestamp (required)
+    //   - subscriptionExpiresAt: timestamp (required)
+    //   - referralCode: string (required)
+    //   - referredBy: string (optional)
+    //   - lineage: map (required) - { l1, l2, l3 }
+    //
+    // Collection: orders, products, customers, expenses, quotes
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - ID of the user who owns the record
+    //   - [other domain specific fields]
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        // Master admin check by email or UID
+        request.auth.token.email == "giufarlosdias@hotmail.com" ||
+        request.auth.uid == "mSp8bIUzDaPESomUAcGhYFtAXIq1" ||
+        // Check role in users collection
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['super-admin', 'admin'])
+      );
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == "giufarlosdias@hotmail.com" ||
+        request.auth.uid == "mSp8bIUzDaPESomUAcGhYFtAXIq1" ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super-admin')
+      );
+    }
+
+    function isMasterAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == "giufarlosdias@hotmail.com" ||
+        request.auth.uid == "mSp8bIUzDaPESomUAcGhYFtAXIq1"
+      );
+    }
+
+    function isValidUser(data) {
+      let requiredFields = ['uid', 'email', 'role', 'status', 'subscriptionStatus'];
+      let allowedFields = [
+        'uid', 'email', 'role', 'status', 'subscriptionStatus', 'officeName', 'phone', 'address', 'pixKey', 
+        'createdAt', 'subscriptionExpiresAt', 'referralCode', 'referredBy', 'lineage',
+        'fullName', 'username', 'whatsapp', 'profilePicUrl', 'cnpj', 'segment', 'logoUrl', 
+        'settings', 'activityLogs', 'documents',
+        'updatedAt', 'updatedBy', 'updatedByName', 'lastReportDate'
+      ];
+      
+      return data.keys().hasAll(requiredFields) &&
+             data.keys().hasOnly(allowedFields) &&
+             data.uid is string && data.uid.size() > 0 && data.uid.size() < 128 &&
+             data.email is string && data.email.size() > 0 && data.email.size() < 256 &&
+             data.role in ['super-admin', 'admin', 'editor', 'viewer'] &&
+             data.status in ['active', 'blocked'] &&
+             data.subscriptionStatus in ['PAID', 'EXPIRED', 'TRIAL'];
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll(['userId', 'customerId', 'total', 'status', 'createdAt']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.total is number && data.total >= 0 &&
+             data.status in ['PAID', 'PENDING', 'CANCELLED'];
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['userId', 'name', 'price', 'stock']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.price is number && data.price >= 0 &&
+             data.stock is number;
+    }
+
+    function isValidCustomer(data) {
+      return data.keys().hasAll(['userId', 'name', 'email']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.email is string && data.email.size() < 256;
+    }
+
+    function isValidExpense(data) {
+      return data.keys().hasAll(['userId', 'description', 'amount']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.description is string && data.description.size() < 500 &&
+             data.amount is number && data.amount >= 0;
+    }
+
+    function isValidQuote(data) {
+      return data.keys().hasAll(['userId', 'customerName', 'total']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.customerName is string && data.customerName.size() < 100 &&
+             data.total is number && data.total >= 0;
+    }
+
+    function isValidFinance(data) {
+      return data.keys().hasAll(['userId', 'type', 'amount', 'description', 'category', 'date', 'status']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.type in ['INCOME', 'EXPENSE', 'FIXED_BILL', 'PURCHASE'] &&
+             data.amount is number &&
+             data.status in ['PAID', 'PENDING', 'OVERDUE', 'RECEIVED'];
+    }
+
+    function isValidStockMovement(data) {
+      return data.keys().hasAll(['userId', 'productId', 'type', 'quantity', 'reason', 'date']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.productId is string &&
+             data.type in ['IN_OUT', 'IN', 'OUT'] &&
+             data.quantity is number;
+    }
+
+    function isValidCalendarEvent(data) {
+      return data.keys().hasAll(['userId', 'title', 'date', 'time', 'status']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.status in ['PENDENTE', 'CONCLUÍDO', 'CANCELADO'];
+    }
+
+    function isValidServiceOrder(data) {
+      return data.keys().hasAll(['userId', 'customerId', 'equipment', 'status', 'cost']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.status in ['OPEN', 'IN_PROGRESS', 'DONE', 'CANCELLED'] &&
+             data.cost is number;
+    }
+
+    function isValidAIVideo(data) {
+      return data.keys().hasAll(['userId', 'videoUrl', 'prompt']) &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.videoUrl is string && data.videoUrl.size() < 2048 &&
+             data.prompt is string && data.prompt.size() < 5000;
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      // Allow read if owner or admin
+      // Explicitly check master admin and owner first to avoid recursion via isAdmin()
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId || 
+        request.auth.token.email == "giufarlosdias@hotmail.com" ||
+        request.auth.uid == "mSp8bIUzDaPESomUAcGhYFtAXIq1" ||
+        isAdmin()
+      );
+      
+      // Allow create if authenticated and data is valid
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    (request.auth.uid == userId || isSuperAdmin());
+      
+      // Allow update if owner (limited fields) or super-admin
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && (
+        (request.auth.uid == userId && request.resource.data.role == resource.data.role) || 
+        isSuperAdmin()
+      );
+      
+      // Only super-admin can delete users
+      allow delete: if isSuperAdmin();
+    }
+
+    match /ai_videos/{videoId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidAIVideo(request.resource.data);
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin()) && isValidAIVideo(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidOrder(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && isValidOrder(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /products/{productId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidProduct(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && isValidProduct(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /customers/{customerId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidCustomer(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && isValidCustomer(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /expenses/{expenseId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidExpense(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && isValidExpense(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /quotes/{quoteId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidQuote(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && isValidQuote(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /finances/{financeId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidFinance(request.resource.data);
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin()) && isValidFinance(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /stock_movements/{movementId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidStockMovement(request.resource.data);
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin()) && isValidStockMovement(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /calendar_events/{eventId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidCalendarEvent(request.resource.data);
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin()) && isValidCalendarEvent(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /service_orders/{orderId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidServiceOrder(request.resource.data);
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin()) && isValidServiceOrder(request.resource.data);
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+  }
+}

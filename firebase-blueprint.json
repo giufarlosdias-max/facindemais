@@ -1,0 +1,249 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile and office management data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "fullName": { "type": "string" },
+        "username": { "type": "string" },
+        "officeName": { "type": "string" },
+        "role": { "type": "string", "enum": ["super-admin", "admin", "editor", "viewer"] },
+        "status": { "type": "string", "enum": ["active", "blocked"] },
+        "subscriptionStatus": { "type": "string", "enum": ["PAID", "EXPIRED", "TRIAL"] },
+        "phone": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "profilePicUrl": { "type": "string" },
+        "cnpj": { "type": "string" },
+        "segment": { "type": "string" },
+        "address": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "pixKey": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "subscriptionExpiresAt": { "type": "string", "format": "date-time" },
+        "referralCode": { "type": "string" },
+        "referredBy": { "type": "string" },
+        "lineage": {
+          "type": "object",
+          "properties": {
+            "l1": { "type": "string" },
+            "l2": { "type": "string" },
+            "l3": { "type": "string" }
+          }
+        },
+        "settings": {
+          "type": "object",
+          "properties": {
+            "language": { "type": "string" },
+            "theme": { "type": "string" },
+            "notifications": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "boolean" },
+                "whatsapp": { "type": "boolean" },
+                "system": { "type": "boolean" }
+              }
+            },
+            "security2FA": { "type": "boolean" }
+          }
+        },
+        "activityLogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "action": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "details": { "type": "string" }
+            }
+          }
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "type": { "type": "string" },
+              "url": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      },
+      "required": ["uid", "email", "role", "status", "subscriptionStatus"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Sales order data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["PAID", "PENDING", "CANCELLED"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Product and service data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "stock": { "type": "number" }
+      }
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" }
+      }
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Financial expense data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "description": { "type": "string" },
+        "amount": { "type": "number" }
+      }
+    },
+    "Quote": {
+      "title": "Quote",
+      "description": "Quote data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "total": { "type": "number" }
+      }
+    },
+    "Finance": {
+      "title": "Finance",
+      "description": "Financial records including income and expenses",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["INCOME", "EXPENSE", "FIXED_BILL", "PURCHASE"] },
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "date": { "type": "string" },
+        "status": { "type": "string", "enum": ["PAID", "PENDING", "OVERDUE", "RECEIVED"] }
+      },
+      "required": ["userId", "type", "amount", "description", "category", "date", "status"]
+    },
+    "StockMovement": {
+      "title": "StockMovement",
+      "description": "Inventory stock movement records",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "productId": { "type": "string" },
+        "type": { "type": "string", "enum": ["IN", "OUT"] },
+        "quantity": { "type": "number" },
+        "reason": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "productId", "type", "quantity", "reason", "date"]
+    },
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "description": "Calendar events and appointments",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDENTE", "CONCLUÍDO", "CANCELADO"] }
+      },
+      "required": ["userId", "title", "date", "time", "status"]
+    },
+    "ServiceOrder": {
+      "title": "ServiceOrder",
+      "description": "Service order and technical diagnosis data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "equipment": { "type": "string" },
+        "status": { "type": "string", "enum": ["OPEN", "IN_PROGRESS", "DONE", "CANCELLED"] },
+        "cost": { "type": "number" }
+      },
+      "required": ["userId", "customerId", "equipment", "status", "cost"]
+    },
+    "AIVideo": {
+      "title": "AIVideo",
+      "description": "AI generated video metadata",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "prompt": { "type": "string" },
+        "style": { "type": "string" },
+        "movement": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "videoUrl", "prompt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Sales orders"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Products"
+    },
+    "/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customers"
+    },
+    "/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Expenses"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "Quote",
+      "description": "Quotes"
+    },
+    "/finances/{financeId}": {
+      "schema": "Finance",
+      "description": "Financial records"
+    },
+    "/stock_movements/{movementId}": {
+      "schema": "StockMovement",
+      "description": "Stock movements"
+    },
+    "/calendar_events/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "Calendar events"
+    },
+    "/service_orders/{orderId}": {
+      "schema": "ServiceOrder",
+      "description": "Service orders"
+    },
+    "/ai_videos/{videoId}": {
+      "schema": "AIVideo",
+      "description": "AI generated videos"
+    }
+  }
+}
